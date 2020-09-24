@@ -672,11 +672,16 @@ MyFrame::MyFrame(wxFrame* parent,
 
     // Use a read-only text control; Cut tool will not cut selected text anyway.
 	//m_treeCtrl = new MyTreeCtrl(m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_ROW_LINES);
-	m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS);
-	wxTreeItemId root = m_treeCtrl->AddRoot("Root", -1, -1, new MyTreeItemData("Root item"));
-	wxTreeItemId child1 = m_treeCtrl->AppendItem(root, "child1", -1, -1, new MyTreeItemData("child 1"));
+	//m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS);
+	//m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_EDIT_LABELS);
+	//m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_NO_BUTTONS);
+	//m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_TWIST_BUTTONS);
+	m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_FULL_ROW_HIGHLIGHT);
+	m_treeCtrl->SetBackgroundColour(*wxYELLOW);
+	wxTreeItemId root = m_treeCtrl->AddRoot("接口测试", -1, -1, new MyTreeItemData("Root item"));
+	wxTreeItemId child1 = m_treeCtrl->AppendItem(root, "rrmanager", -1, -1, new MyTreeItemData("child 1"));
 	wxTreeItemId grandson1 = m_treeCtrl->AppendItem(child1, "grandson1", -1, -1, new MyTreeItemData("grandson 1"));
-	wxTreeItemId child2 = m_treeCtrl->AppendItem(root, "child2", -1, -1, new MyTreeItemData("child 2"));
+	wxTreeItemId child2 = m_treeCtrl->AppendItem(root, "failover", -1, -1, new MyTreeItemData("child 2"));
 	printf("new tree ctrl succeed\n");
     m_textWindow = new wxTextCtrl(m_panel_right, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
 
@@ -695,7 +700,7 @@ MyFrame::MyFrame(wxFrame* parent,
 	//printf("set sizer 3\n");
 	m_splitter->SplitVertically(m_panel_left, m_panel_right, 100);
 
-    SetInitialSize(FromDIP(wxSize(650, 350)));
+    SetInitialSize(FromDIP(wxSize(800, 600)));
 }
 
 MyFrame::~MyFrame()
