@@ -34,6 +34,7 @@
 #include "wx/colordlg.h"
 #include "wx/srchctrl.h"
 #include "wx/treectrl.h"
+#include "wx/splitter.h"
 //#include "wx/generic/treectlg.h"
 
 // define this to use XPMs everywhere (by default, BMPs are used under Win)
@@ -168,7 +169,8 @@ private:
 
     wxTextCtrl         *m_textWindow;
 
-    wxPanel            *m_panel;
+    wxPanel            *m_panel_left;
+    wxPanel            *m_panel_right;
 #if USE_UNMANAGED_TOOLBAR
     wxToolBar          *m_extraToolBar;
 #endif
@@ -182,6 +184,8 @@ private:
     wxToolBarToolBase *m_searchTool;
 
     wxTreeCtrl *m_treeCtrl;
+
+	wxSplitterWindow *m_splitter;
 
     wxDECLARE_EVENT_TABLE();
 };
@@ -656,7 +660,11 @@ MyFrame::MyFrame(wxFrame* parent,
     // Create the toolbar
     RecreateToolbar();
 
-    m_panel = new wxPanel(this, wxID_ANY);
+	m_splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN);
+    m_panel_left = new wxPanel(m_splitter, wxID_ANY);
+	m_panel_left->SetBackgroundColour(*wxYELLOW);
+    m_panel_right = new wxPanel(m_splitter, wxID_ANY);
+	m_panel_right->SetBackgroundColour(*wxBLUE);
 #if USE_UNMANAGED_TOOLBAR
     m_extraToolBar = new wxToolBar(m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_TEXT|wxTB_FLAT|wxTB_TOP);
     PopulateToolbar(m_extraToolBar);
@@ -664,25 +672,28 @@ MyFrame::MyFrame(wxFrame* parent,
 
     // Use a read-only text control; Cut tool will not cut selected text anyway.
 	//m_treeCtrl = new MyTreeCtrl(m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_ROW_LINES);
-	m_treeCtrl = new wxTreeCtrl(m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS);
+	m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS);
 	wxTreeItemId root = m_treeCtrl->AddRoot("Root", -1, -1, new MyTreeItemData("Root item"));
 	wxTreeItemId child1 = m_treeCtrl->AppendItem(root, "child1", -1, -1, new MyTreeItemData("child 1"));
 	wxTreeItemId grandson1 = m_treeCtrl->AppendItem(child1, "grandson1", -1, -1, new MyTreeItemData("grandson 1"));
 	wxTreeItemId child2 = m_treeCtrl->AppendItem(root, "child2", -1, -1, new MyTreeItemData("child 2"));
 	printf("new tree ctrl succeed\n");
-    m_textWindow = new wxTextCtrl(m_panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
+    m_textWindow = new wxTextCtrl(m_panel_right, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
 
-    wxBoxSizer* sizer = new wxBoxSizer(::wxHORIZONTAL);
-    m_panel->SetSizer(sizer);
+    wxBoxSizer* sizer_left = new wxBoxSizer(::wxHORIZONTAL);
+    m_panel_left->SetSizer(sizer_left);
+    wxBoxSizer* sizer_right = new wxBoxSizer(::wxHORIZONTAL);
+    m_panel_right->SetSizer(sizer_right);
 #if USE_UNMANAGED_TOOLBAR
-    if (m_extraToolBar)
-        sizer->Add(m_extraToolBar, 0, wxEXPAND, 0);
+    //if (m_extraToolBar)
+     //   sizer->Add(m_extraToolBar, 0, wxEXPAND, 0);
 #endif
-	printf("set sizer 1\n");
-    sizer->Add(m_treeCtrl, 1, wxEXPAND, 0);
-	printf("set sizer 2\n");
-    sizer->Add(m_textWindow, 1, wxEXPAND, 0);
-	printf("set sizer 3\n");
+	//printf("set sizer 1\n");
+    sizer_left->Add(m_treeCtrl, 1, wxEXPAND, 0);
+	//printf("set sizer 2\n");
+    sizer_right->Add(m_textWindow, 1, wxEXPAND, 0);
+	//printf("set sizer 3\n");
+	m_splitter->SplitVertically(m_panel_left, m_panel_right, 100);
 
     SetInitialSize(FromDIP(wxSize(650, 350)));
 }
@@ -714,7 +725,7 @@ void MyFrame::LayoutChildren()
         offset = 0;
     }
 
-    m_panel->SetSize(offset, 0, size.x - offset, size.y);
+    m_panel_right->SetSize(offset, 0, size.x - offset, size.y);
 }
 
 void MyFrame::OnSize(wxSizeEvent& event)
