@@ -168,9 +168,12 @@ private:
     Positions           m_toolbarPosition;
 
     wxTextCtrl         *m_textWindow;
+    wxTextCtrl         *m_textWindow2;
 
     wxPanel            *m_panel_left;
     wxPanel            *m_panel_right;
+    wxPanel            *m_panel_right_top;
+    wxPanel            *m_panel_right_bottom;
 #if USE_UNMANAGED_TOOLBAR
     wxToolBar          *m_extraToolBar;
 #endif
@@ -186,6 +189,7 @@ private:
     wxTreeCtrl *m_treeCtrl;
 
 	wxSplitterWindow *m_splitter;
+	wxSplitterWindow *m_contentSplitter;
 
     wxDECLARE_EVENT_TABLE();
 };
@@ -663,8 +667,12 @@ MyFrame::MyFrame(wxFrame* parent,
 	m_splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN);
     m_panel_left = new wxPanel(m_splitter, wxID_ANY);
 	m_panel_left->SetBackgroundColour(*wxYELLOW);
-    m_panel_right = new wxPanel(m_splitter, wxID_ANY);
-	m_panel_right->SetBackgroundColour(*wxBLUE);
+
+	m_contentSplitter = new wxSplitterWindow(m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN);
+    m_panel_right_top = new wxPanel(m_contentSplitter, wxID_ANY);
+	m_panel_right_top->SetBackgroundColour(*wxBLUE);
+    m_panel_right_bottom = new wxPanel(m_contentSplitter, wxID_ANY);
+	m_panel_right_bottom->SetBackgroundColour(*wxRED);
 #if USE_UNMANAGED_TOOLBAR
     m_extraToolBar = new wxToolBar(m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_TEXT|wxTB_FLAT|wxTB_TOP);
     PopulateToolbar(m_extraToolBar);
@@ -683,12 +691,17 @@ MyFrame::MyFrame(wxFrame* parent,
 	wxTreeItemId grandson1 = m_treeCtrl->AppendItem(child1, "grandson1", -1, -1, new MyTreeItemData("grandson 1"));
 	wxTreeItemId child2 = m_treeCtrl->AppendItem(root, "failover", -1, -1, new MyTreeItemData("child 2"));
 	printf("new tree ctrl succeed\n");
-    m_textWindow = new wxTextCtrl(m_panel_right, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
+    m_textWindow = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
+    m_textWindow2 = new wxTextCtrl(m_panel_right_bottom, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
 
     wxBoxSizer* sizer_left = new wxBoxSizer(::wxHORIZONTAL);
+	printf("new wx box sizer 1\n");
     m_panel_left->SetSizer(sizer_left);
-    wxBoxSizer* sizer_right = new wxBoxSizer(::wxHORIZONTAL);
-    m_panel_right->SetSizer(sizer_right);
+    wxBoxSizer* sizer_right_top = new wxBoxSizer(::wxVERTICAL);
+    wxBoxSizer* sizer_right_bottom = new wxBoxSizer(::wxVERTICAL);
+	//printf("new wx box sizer 2\n");
+    m_panel_right_top->SetSizer(sizer_right_top);
+    m_panel_right_bottom->SetSizer(sizer_right_bottom);
 #if USE_UNMANAGED_TOOLBAR
     //if (m_extraToolBar)
      //   sizer->Add(m_extraToolBar, 0, wxEXPAND, 0);
@@ -696,11 +709,19 @@ MyFrame::MyFrame(wxFrame* parent,
 	//printf("set sizer 1\n");
     sizer_left->Add(m_treeCtrl, 1, wxEXPAND, 0);
 	//printf("set sizer 2\n");
-    sizer_right->Add(m_textWindow, 1, wxEXPAND, 0);
+    sizer_right_top->Add(m_textWindow, 1, wxEXPAND, 0);
+    sizer_right_bottom->Add(m_textWindow2, 1, wxEXPAND, 0);
 	//printf("set sizer 3\n");
-	m_splitter->SplitVertically(m_panel_left, m_panel_right, 100);
+  
+	m_contentSplitter->SplitHorizontally(m_panel_right_top, m_panel_right_bottom, 100);
+	printf("before split\n");
+	//m_splitter->SplitVertically(m_panel_left, m_panel_right, 100);
+	m_splitter->SplitVertically(m_panel_left, m_contentSplitter, 100);
+	//m_splitter->SplitVertically(m_panel_left, m_textWindow, 100);
+	printf("after split\n");
 
     SetInitialSize(FromDIP(wxSize(800, 600)));
+	printf("end\n");
 }
 
 MyFrame::~MyFrame()
@@ -730,7 +751,7 @@ void MyFrame::LayoutChildren()
         offset = 0;
     }
 
-    m_panel_right->SetSize(offset, 0, size.x - offset, size.y);
+    //m_panel_right->SetSize(offset, 0, size.x - offset, size.y);
 }
 
 void MyFrame::OnSize(wxSizeEvent& event)
