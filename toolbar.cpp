@@ -174,6 +174,10 @@ private:
     wxPanel            *m_panel_right;
     wxPanel            *m_panel_right_top;
     wxPanel            *m_panel_right_bottom;
+    wxTextCtrl         *m_url;
+    wxTextCtrl         *m_method;
+    wxTextCtrl         *m_data;
+    
 #if USE_UNMANAGED_TOOLBAR
     wxToolBar          *m_extraToolBar;
 #endif
@@ -691,7 +695,9 @@ MyFrame::MyFrame(wxFrame* parent,
 	wxTreeItemId grandson1 = m_treeCtrl->AppendItem(child1, "grandson1", -1, -1, new MyTreeItemData("grandson 1"));
 	wxTreeItemId child2 = m_treeCtrl->AppendItem(root, "failover", -1, -1, new MyTreeItemData("child 2"));
 	printf("new tree ctrl succeed\n");
-    m_textWindow = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
+    m_method = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
+    m_data = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    m_textWindow = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
     m_textWindow2 = new wxTextCtrl(m_panel_right_bottom, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
 
     wxBoxSizer* sizer_left = new wxBoxSizer(::wxHORIZONTAL);
@@ -709,7 +715,9 @@ MyFrame::MyFrame(wxFrame* parent,
 	//printf("set sizer 1\n");
     sizer_left->Add(m_treeCtrl, 1, wxEXPAND, 0);
 	//printf("set sizer 2\n");
-    sizer_right_top->Add(m_textWindow, 1, wxEXPAND, 0);
+    sizer_right_top->Add(m_textWindow, 1, wxSHAPED, 0);
+    sizer_right_top->Add(m_method, 1,wxSHAPED, 0);
+    sizer_right_top->Add(m_data, 1, wxSHAPED, 0);
     sizer_right_bottom->Add(m_textWindow2, 1, wxEXPAND, 0);
 	//printf("set sizer 3\n");
   
