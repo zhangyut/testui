@@ -52,6 +52,7 @@ TOOLBAR_CXXFLAGS = $(WX_CPPFLAGS) -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) \
 	$(WX_CXXFLAGS) $(SAMPLES_CXXFLAGS) $(CPPFLAGS) $(CXXFLAGS)
 TOOLBAR_OBJECTS =  \
 	toolbar_toolbar.o \
+	httpwindow.o \
 	$(__toolbar___win32rc)
 
 ### Conditionally set variables: ###
@@ -179,6 +180,8 @@ toolbar.app/Contents/PkgInfo: toolbar$(EXEEXT) $(top_srcdir)/src/osx/carbon/Info
 
 toolbar_toolbar.o: $(srcdir)/toolbar.cpp
 	$(CXXC) -c -o $@ $(TOOLBAR_CXXFLAGS) $(srcdir)/toolbar.cpp
+httpwindow.o: $(srcdir)/httpwindow.cpp
+	$(CXXC) -c -o $@ $(TOOLBAR_CXXFLAGS) $(srcdir)/httpwindow.cpp
 
 toolbar_toolbar_rc.o: $(srcdir)/toolbar.rc
 	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_1) $(__DEBUG_DEFINE_p_1)  $(__EXCEPTIONS_DEFINE_p_1) $(__RTTI_DEFINE_p_1) $(__THREAD_DEFINE_p_1)  --include-dir $(srcdir) $(__DLLFLAG_p_1) $(__WIN32_DPI_MANIFEST_p) --include-dir $(srcdir)/../../samples $(__RCDEFDIR_p) --include-dir $(top_srcdir)/include

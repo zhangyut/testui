@@ -35,6 +35,7 @@
 #include "wx/srchctrl.h"
 #include "wx/treectrl.h"
 #include "wx/splitter.h"
+#include "httpwindow.h"
 //#include "wx/generic/treectlg.h"
 
 // define this to use XPMs everywhere (by default, BMPs are used under Win)
@@ -167,13 +168,7 @@ private:
     // store toolbar position for future use
     Positions           m_toolbarPosition;
 
-    wxTextCtrl         *m_textWindow;
-    wxTextCtrl         *m_textWindow2;
-
     wxPanel            *m_panel_left;
-    wxPanel            *m_panel_right;
-    wxPanel            *m_panel_right_top;
-    wxPanel            *m_panel_right_bottom;
     wxTextCtrl         *m_url;
     wxTextCtrl         *m_method;
     wxTextCtrl         *m_data;
@@ -193,7 +188,8 @@ private:
     wxTreeCtrl *m_treeCtrl;
 
 	wxSplitterWindow *m_splitter;
-	wxSplitterWindow *m_contentSplitter;
+
+	wxSplitterWindow *m_httpTestWin;
 
     wxDECLARE_EVENT_TABLE();
 };
@@ -672,22 +668,12 @@ MyFrame::MyFrame(wxFrame* parent,
     m_panel_left = new wxPanel(m_splitter, wxID_ANY);
 	m_panel_left->SetBackgroundColour(*wxYELLOW);
 
-	m_contentSplitter = new wxSplitterWindow(m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN);
-    m_panel_right_top = new wxPanel(m_contentSplitter, wxID_ANY);
-	m_panel_right_top->SetBackgroundColour(*wxBLUE);
-    m_panel_right_bottom = new wxPanel(m_contentSplitter, wxID_ANY);
-	m_panel_right_bottom->SetBackgroundColour(*wxRED);
+	m_httpTestWin = new HttpTestWindow(m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN);
 #if USE_UNMANAGED_TOOLBAR
     m_extraToolBar = new wxToolBar(m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_TEXT|wxTB_FLAT|wxTB_TOP);
     PopulateToolbar(m_extraToolBar);
 #endif
 
-    // Use a read-only text control; Cut tool will not cut selected text anyway.
-	//m_treeCtrl = new MyTreeCtrl(m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_ROW_LINES);
-	//m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS);
-	//m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_EDIT_LABELS);
-	//m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_NO_BUTTONS);
-	//m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_TWIST_BUTTONS);
 	m_treeCtrl = new wxTreeCtrl(m_panel_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_FULL_ROW_HIGHLIGHT);
 	m_treeCtrl->SetBackgroundColour(*wxYELLOW);
 	wxTreeItemId root = m_treeCtrl->AddRoot("接口测试", -1, -1, new MyTreeItemData("Root item"));
@@ -695,50 +681,13 @@ MyFrame::MyFrame(wxFrame* parent,
 	wxTreeItemId grandson1 = m_treeCtrl->AppendItem(child1, "grandson1", -1, -1, new MyTreeItemData("grandson 1"));
 	wxTreeItemId child2 = m_treeCtrl->AppendItem(root, "failover", -1, -1, new MyTreeItemData("child 2"));
 	printf("new tree ctrl succeed\n");
-	printf("right top panel width : %d\n", m_panel_right_top->GetBestSize().GetWidth());
-    m_method = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(300, 30));
-    m_data = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(300, 100), wxTE_MULTILINE);
-    m_textWindow = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(300, 30));
-    m_textWindow2 = new wxTextCtrl(m_panel_right_bottom, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
 
     wxBoxSizer* sizer_left = new wxBoxSizer(::wxHORIZONTAL);
+	sizer_left->Add(m_treeCtrl, 0, wxEXPAND,0);
 	printf("new wx box sizer 1\n");
     m_panel_left->SetSizer(sizer_left);
-    //wxBoxSizer* sizer_right_top = new wxBoxSizer(::wxVERTICAL);
-    wxGridSizer* sizer_right_top = new wxGridSizer(2, 5, 5);
-    wxBoxSizer* sizer_right_bottom = new wxBoxSizer(::wxVERTICAL);
-	//printf("new wx box sizer 2\n");
-    m_panel_right_top->SetSizer(sizer_right_top);
-    m_panel_right_bottom->SetSizer(sizer_right_bottom);
-#if USE_UNMANAGED_TOOLBAR
-    //if (m_extraToolBar)
-     //   sizer->Add(m_extraToolBar, 0, wxEXPAND, 0);
-#endif
-	//printf("set sizer 1\n");
-    sizer_left->Add(m_treeCtrl, 1, wxEXPAND, 0);
-	//printf("set sizer 2\n");
-    sizer_right_top->Add(
-        new wxStaticText( m_panel_right_top, wxID_ANY, "url:" ),
-        wxSizerFlags().Align(wxALIGN_LEFT).Border(wxALL & ~wxBOTTOM, 5));
-    sizer_right_top->Add(m_textWindow, 1, wxALIGN_TOP, 0);
-    sizer_right_top->Add(
-        new wxStaticText( m_panel_right_top, wxID_ANY, "method:" ),
-        wxSizerFlags().Align(wxALIGN_LEFT).Border(wxALL & ~wxBOTTOM, 5));
-    sizer_right_top->Add(m_method, 1,wxALIGN_TOP, 0);
-    sizer_right_top->Add(
-        new wxStaticText( m_panel_right_top, wxID_ANY, "data:" ),
-        wxSizerFlags().Align(wxALIGN_LEFT).Border(wxALL & ~wxBOTTOM, 5));
-    sizer_right_top->Add(m_data, 1, wxALIGN_TOP, 0);
-    sizer_right_top->Add(new wxButton(m_panel_right_top, wxID_ANY, "提交"), 1, wxALIGN_CENTER_VERTICAL, 0);
-    sizer_right_bottom->Add(m_textWindow2, 1, wxEXPAND, 0);
-	//printf("set sizer 3\n");
-  
-	m_contentSplitter->SplitHorizontally(m_panel_right_top, m_panel_right_bottom, 300);
-	printf("before split\n");
-	//m_splitter->SplitVertically(m_panel_left, m_panel_right, 100);
-	m_splitter->SplitVertically(m_panel_left, m_contentSplitter, 100);
-	//m_splitter->SplitVertically(m_panel_left, m_textWindow, 100);
-	printf("after split\n");
+
+	m_splitter->SplitVertically(m_panel_left, m_httpTestWin, 100);
 
     SetInitialSize(FromDIP(wxSize(800, 600)));
 	printf("end\n");
@@ -771,7 +720,6 @@ void MyFrame::LayoutChildren()
         offset = 0;
     }
 
-    //m_panel_right->SetSize(offset, 0, size.x - offset, size.y);
 }
 
 void MyFrame::OnSize(wxSizeEvent& event)
@@ -904,11 +852,6 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnAbout(wxCommandEvent& event)
 {
-    if ( event.IsChecked() )
-        m_textWindow->AppendText( "Help button down now.\n" );
-    else
-        m_textWindow->AppendText( "Help button up now.\n" );
-
     (void)wxMessageBox("wxWidgets toolbar sample", "About wxToolBar");
 }
 
@@ -916,7 +859,6 @@ void MyFrame::OnToolLeftClick(wxCommandEvent& event)
 {
     wxString str;
     str.Printf( "Clicked on tool %d\n", event.GetId());
-    m_textWindow->AppendText( str );
 
     if (event.GetId() == wxID_COPY)
     {
@@ -936,9 +878,6 @@ void MyFrame::OnToolLeftClick(wxCommandEvent& event)
 
 void MyFrame::OnToolRightClick(wxCommandEvent& event)
 {
-    m_textWindow->AppendText(
-            wxString::Format("Tool %d right clicked.\n",
-                             (int) event.GetInt()));
 }
 
 void MyFrame::OnCombo(wxCommandEvent& event)
@@ -953,7 +892,6 @@ void MyFrame::DoEnablePrint()
 
     wxToolBarBase *tb = GetToolBar();
     tb->EnableTool(wxID_PRINT, !tb->GetToolEnabled(wxID_PRINT));
-    m_textWindow->AppendText("Print tool state changed.\n");
 }
 
 void MyFrame::DoDeletePrint()
@@ -963,7 +901,6 @@ void MyFrame::DoDeletePrint()
 
     wxToolBarBase *tb = GetToolBar();
     tb->DeleteTool( wxID_PRINT );
-    m_textWindow->AppendText("Print tool was deleted.\n");
 
     m_nPrint--;
 }
@@ -972,7 +909,6 @@ void MyFrame::DoToggleHelp()
 {
     wxToolBarBase *tb = GetToolBar();
     tb->ToggleTool( wxID_HELP, !tb->GetToolState( wxID_HELP ) );
-    m_textWindow->AppendText("Help tool was toggled.\n");
 }
 
 void MyFrame::OnToggleSearch(wxCommandEvent& WXUNUSED(event))
@@ -1005,7 +941,7 @@ void MyFrame::OnToggleSearch(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnUpdateCopyAndCut(wxUpdateUIEvent& event)
 {
-    event.Enable( m_textWindow->CanCopy() );
+    //event.Enable( m_textWindow->CanCopy() );
 }
 
 void MyFrame::OnUpdateToggleHorzText(wxUpdateUIEvent& event)
@@ -1105,7 +1041,6 @@ void MyFrame::OnToolDropdown(wxCommandEvent& event)
 {
     wxString str;
     str.Printf( "Dropdown on tool %d\n", event.GetId());
-    m_textWindow->AppendText( str );
 
     event.Skip();
 }
