@@ -36,6 +36,10 @@
 #include "wx/srchctrl.h"
 #include "wx/splitter.h"
 
+enum {
+	ID_BUTTON_COMMIT = 1
+};
+
 class HttpTestWindow: public wxSplitterWindow
 {
 public:
@@ -45,6 +49,9 @@ public:
             const wxSize& size = wxDefaultSize,
             long style = wxDEFAULT_FRAME_STYLE|wxCLIP_CHILDREN);
     virtual ~HttpTestWindow();
+
+private:
+	void onCommit(wxCommandEvent&);
 
 private:
     wxTextCtrl         *m_textWindow;
@@ -59,7 +66,7 @@ private:
     wxGridSizer        *m_sizer_top;
     wxBoxSizer         *m_sizer_bottom;
     
-    wxDECLARE_EVENT_TABLE();
+    //wxDECLARE_EVENT_TABLE();
 };
 
 #endif
