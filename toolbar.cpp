@@ -695,15 +695,17 @@ MyFrame::MyFrame(wxFrame* parent,
 	wxTreeItemId grandson1 = m_treeCtrl->AppendItem(child1, "grandson1", -1, -1, new MyTreeItemData("grandson 1"));
 	wxTreeItemId child2 = m_treeCtrl->AppendItem(root, "failover", -1, -1, new MyTreeItemData("child 2"));
 	printf("new tree ctrl succeed\n");
-    m_method = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
-    m_data = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-    m_textWindow = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
+	printf("right top panel width : %d\n", m_panel_right_top->GetBestSize().GetWidth());
+    m_method = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(300, 30));
+    m_data = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(300, 100), wxTE_MULTILINE);
+    m_textWindow = new wxTextCtrl(m_panel_right_top, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(300, 30));
     m_textWindow2 = new wxTextCtrl(m_panel_right_bottom, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
 
     wxBoxSizer* sizer_left = new wxBoxSizer(::wxHORIZONTAL);
 	printf("new wx box sizer 1\n");
     m_panel_left->SetSizer(sizer_left);
-    wxBoxSizer* sizer_right_top = new wxBoxSizer(::wxVERTICAL);
+    //wxBoxSizer* sizer_right_top = new wxBoxSizer(::wxVERTICAL);
+    wxGridSizer* sizer_right_top = new wxGridSizer(2, 5, 5);
     wxBoxSizer* sizer_right_bottom = new wxBoxSizer(::wxVERTICAL);
 	//printf("new wx box sizer 2\n");
     m_panel_right_top->SetSizer(sizer_right_top);
@@ -715,13 +717,23 @@ MyFrame::MyFrame(wxFrame* parent,
 	//printf("set sizer 1\n");
     sizer_left->Add(m_treeCtrl, 1, wxEXPAND, 0);
 	//printf("set sizer 2\n");
-    sizer_right_top->Add(m_textWindow, 1, wxSHAPED, 0);
-    sizer_right_top->Add(m_method, 1,wxSHAPED, 0);
-    sizer_right_top->Add(m_data, 1, wxSHAPED, 0);
+    sizer_right_top->Add(
+        new wxStaticText( m_panel_right_top, wxID_ANY, "url:" ),
+        wxSizerFlags().Align(wxALIGN_LEFT).Border(wxALL & ~wxBOTTOM, 5));
+    sizer_right_top->Add(m_textWindow, 1, wxALIGN_TOP, 0);
+    sizer_right_top->Add(
+        new wxStaticText( m_panel_right_top, wxID_ANY, "method:" ),
+        wxSizerFlags().Align(wxALIGN_LEFT).Border(wxALL & ~wxBOTTOM, 5));
+    sizer_right_top->Add(m_method, 1,wxALIGN_TOP, 0);
+    sizer_right_top->Add(
+        new wxStaticText( m_panel_right_top, wxID_ANY, "data:" ),
+        wxSizerFlags().Align(wxALIGN_LEFT).Border(wxALL & ~wxBOTTOM, 5));
+    sizer_right_top->Add(m_data, 1, wxALIGN_TOP, 0);
+    sizer_right_top->Add(new wxButton(m_panel_right_top, wxID_ANY, "提交"), 1, wxALIGN_CENTER_VERTICAL, 0);
     sizer_right_bottom->Add(m_textWindow2, 1, wxEXPAND, 0);
 	//printf("set sizer 3\n");
   
-	m_contentSplitter->SplitHorizontally(m_panel_right_top, m_panel_right_bottom, 100);
+	m_contentSplitter->SplitHorizontally(m_panel_right_top, m_panel_right_bottom, 300);
 	printf("before split\n");
 	//m_splitter->SplitVertically(m_panel_left, m_panel_right, 100);
 	m_splitter->SplitVertically(m_panel_left, m_contentSplitter, 100);
