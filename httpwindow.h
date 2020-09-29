@@ -37,7 +37,8 @@
 #include "wx/splitter.h"
 
 enum {
-	ID_BUTTON_COMMIT = 1
+	ID_BUTTON_COMMIT = 1,
+	ID_BUTTON_CLEAR = 2
 };
 
 class HttpTestWindow: public wxSplitterWindow
@@ -52,6 +53,7 @@ public:
 
 private:
 	void onCommit(wxCommandEvent&);
+	void onClear(wxCommandEvent&);
 
 private:
     wxTextCtrl         *m_textWindow;
@@ -59,13 +61,13 @@ private:
 
     wxPanel            *m_panel_top;
     wxPanel            *m_panel_bottom;
+    wxTextCtrl         *m_host;
     wxTextCtrl         *m_url;
     wxTextCtrl         *m_method;
     wxTextCtrl         *m_data;
     wxTextCtrl         *m_result;
     wxGridSizer        *m_sizer_top;
     wxBoxSizer         *m_sizer_bottom;
-    
     //wxDECLARE_EVENT_TABLE();
 };
 

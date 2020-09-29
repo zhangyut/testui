@@ -17,7 +17,7 @@ NM = nm
 BK_DEPS = /Users/leizhang/src/wxWidgets/bk-deps
 srcdir = .
 top_srcdir = /Users/leizhang/src/wxWidgets
-LIBS = -lz -framework Security -lpthread -liconv
+LIBS = -lz -framework Security -lpthread -liconv -lwx_baseu_net-3.1
 LDFLAGS_GUI = 
 CXX = g++ -std=gnu++11 -mmacosx-version-min=10.10
 CXXFLAGS = -I/Users/leizhang/src/brew/Cellar/libtiff/4.0.10_1/include
